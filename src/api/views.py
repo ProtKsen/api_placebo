@@ -62,7 +62,9 @@ class PositionListAPIView(generics.ListAPIView, APIView):
     def get_queryset(self):
         department_id = self.kwargs["department_id"]
         if Department.objects.filter(id=department_id).exists():
-            return Position.objects.filter(department__id=department_id)
+            return Position.objects.select_related("department").filter(
+                department__id=department_id
+            )
         raise NotFound
 
     def post(self, request, department_id):
@@ -122,7 +124,7 @@ class PositionDetailAPIView(generics.ListAPIView, APIView):
 
 class EmployeesListApiView(generics.ListAPIView, APIView):
     model = Employee
-    queryset = Employee.objects.all()
+    queryset = Employee.objects.prefetch_related("position", "position__department").all()
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
