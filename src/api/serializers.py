@@ -24,8 +24,22 @@ class PositionCreateSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    position = PositionSerializer()
+    positions = serializers.ListSerializer(child=PositionSerializer())
 
     class Meta:
         model = models.Employee
         fields = "__all__"
+
+
+class EmployeeCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Employee
+        exclude = ["position"]
+
+
+class EmployeeUpdateSerializer(serializers.ModelSerializer):
+    position_id = serializers.IntegerField()
+
+    class Meta:
+        model = models.Employee
+        exclude = ["position"]

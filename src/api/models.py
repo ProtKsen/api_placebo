@@ -25,4 +25,4 @@ class Position(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(max_length=100)
-    position = models.ManyToManyField(Position)
+    position = models.ManyToManyField(Position, blank=True, null=True)

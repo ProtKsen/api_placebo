@@ -4,9 +4,10 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Department, Position
-from .serializers import (DepartmentSerializer, PositionCreateSerializer,
-                          PositionSerializer)
+from .models import Department, Employee, Position
+from .serializers import (DepartmentSerializer, EmployeeCreateSerializer,
+                          EmployeeSerializer, EmployeeUpdateSerializer,
+                          PositionCreateSerializer, PositionSerializer)
 
 
 class DepartmentAPIView(generics.ListAPIView, APIView):
@@ -25,15 +26,15 @@ class DepartmentAPIView(generics.ListAPIView, APIView):
 class DepartmentDetailAPIView(generics.ListAPIView, APIView):
     serializer_class = DepartmentSerializer
 
-    def get(self, request, pk):
-        department = Department.objects.filter(pk=pk).first()
+    def get(self, request, department_id):
+        department = Department.objects.filter(id=department_id).first()
         if department:
             serializer = DepartmentSerializer(department)
             return Response(serializer.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, pk):
-        department = Department.objects.filter(pk=pk).first()
+    def put(self, request, department_id):
+        department = Department.objects.filter(id=department_id).first()
         if department:
             data = DepartmentSerializer(data=request.data)
             if data.is_valid():
@@ -42,8 +43,8 @@ class DepartmentDetailAPIView(generics.ListAPIView, APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def delete(self, request, pk):
-        department = Department.objects.filter(pk=pk).first()
+    def delete(self, request, department_id):
+        department = Department.objects.filter(id=department_id).first()
         if department:
             department.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -51,7 +52,7 @@ class DepartmentDetailAPIView(generics.ListAPIView, APIView):
 
 
 class PositionListAPIView(generics.ListAPIView, APIView):
-    serializer_class = PositionSerializer
+    serializer_class = PositionCreateSerializer
     model = Position
 
     def get_queryset(self):
@@ -105,4 +106,49 @@ class PositionDetailAPIView(generics.ListAPIView, APIView):
             if position:
                 position.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class EmployeesListApiView(generics.ListAPIView, APIView):
+    serializer_class = EmployeeCreateSerializer
+    model = Employee
+    queryset = Employee.objects.all()
+
+    def post(self, request):
+        data = EmployeeCreateSerializer(data=request.data)
+        if data.is_valid():
+            employee = Employee.objects.get_or_create(name=data["name"])
+            return Response(model_to_dict(employee), status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmployeeDetailAPIView(generics.ListAPIView, APIView):
+    serializer_class = EmployeeUpdateSerializer
+
+    def get(self, request, employee_id):
+        employee = Employee.objects.filter(id=employee_id).first()
+        if employee:
+            serializer = EmployeeSerializer(employee)
+            return Response(serializer.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, employee_id):
+        employee = Employee.objects.filter(id=employee_id).first()
+        if employee:
+            data = EmployeeUpdateSerializer(data=request.data)
+            if data.is_valid():
+                employee = Employee.objects.update(**data.data)
+                position = Position.objects.filter(id=data["position_id"]).first()
+                if position:
+                    employee.position = position
+                employee.save()
+                return Response(model_to_dict(position), status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, employee_id):
+        employee = Employee.objects.filter(id=employee_id).first()
+        if employee:
+            employee.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_404_NOT_FOUND)
