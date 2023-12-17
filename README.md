@@ -48,4 +48,4 @@ cd api-placebo
 python src/manage.py runserver
 ```
 
-Документация доступна по адесу <http://127.0.0.1:8000/swagger-ui/>.
+Документация доступна по адесу <http://127.0.0.1:8000/swagger-ui/>, а также в файле swagger.yaml .
