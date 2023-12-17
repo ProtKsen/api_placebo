@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Department(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, unique=True)
     chief_department = models.ForeignKey(
         "Department", on_delete=models.DO_NOTHING, blank=True, null=True
     )
