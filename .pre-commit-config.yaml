@@ -28,4 +28,3 @@ repos:
   rev: v1.24.0
   hooks:
   - id: djlint-django
-  exclude: '*/templates/*'
