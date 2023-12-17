@@ -24,8 +24,6 @@ class PositionCreateSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    positions = serializers.ListSerializer(child=PositionSerializer())
-
     class Meta:
         model = models.Employee
         fields = "__all__"

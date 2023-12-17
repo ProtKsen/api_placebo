@@ -52,8 +52,12 @@ class DepartmentDetailAPIView(generics.ListAPIView, APIView):
 
 
 class PositionListAPIView(generics.ListAPIView, APIView):
-    serializer_class = PositionCreateSerializer
     model = Position
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "POST":
+            return PositionCreateSerializer
+        return PositionSerializer
 
     def get_queryset(self):
         department_id = self.kwargs["department_id"]
@@ -77,6 +81,11 @@ class PositionListAPIView(generics.ListAPIView, APIView):
 class PositionDetailAPIView(generics.ListAPIView, APIView):
     serializer_class = PositionCreateSerializer
 
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "PUT":
+            return PositionCreateSerializer
+        return PositionSerializer
+
     def get(self, request, department_id, position_id):
         department = Department.objects.filter(id=department_id).first()
         if department:
@@ -93,7 +102,9 @@ class PositionDetailAPIView(generics.ListAPIView, APIView):
             if position:
                 data = PositionCreateSerializer(data=request.data)
                 if data.is_valid():
-                    position = Position.objects.create(**data.data, department=department)
+                    for attr, value in data.data.items():
+                        setattr(position, attr, value)
+                    position.department = department
                     position.save()
                     return Response(model_to_dict(position), status=status.HTTP_201_CREATED)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -110,20 +121,28 @@ class PositionDetailAPIView(generics.ListAPIView, APIView):
 
 
 class EmployeesListApiView(generics.ListAPIView, APIView):
-    serializer_class = EmployeeCreateSerializer
     model = Employee
     queryset = Employee.objects.all()
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "POST":
+            return EmployeeCreateSerializer
+        return EmployeeSerializer
 
     def post(self, request):
         data = EmployeeCreateSerializer(data=request.data)
         if data.is_valid():
-            employee = Employee.objects.get_or_create(name=data["name"])
-            return Response(model_to_dict(employee), status=status.HTTP_201_CREATED)
+            employee, created = Employee.objects.get_or_create(**data.data)
+            if created:
+                return Response(model_to_dict(employee), status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EmployeeDetailAPIView(generics.ListAPIView, APIView):
-    serializer_class = EmployeeUpdateSerializer
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "PUT":
+            return EmployeeUpdateSerializer
+        return EmployeeSerializer
 
     def get(self, request, employee_id):
         employee = Employee.objects.filter(id=employee_id).first()
@@ -137,10 +156,11 @@ class EmployeeDetailAPIView(generics.ListAPIView, APIView):
         if employee:
             data = EmployeeUpdateSerializer(data=request.data)
             if data.is_valid():
-                employee = Employee.objects.update(**data.data)
-                position = Position.objects.filter(id=data["position_id"]).first()
+                for attr, value in data.data.items():
+                    setattr(employee, attr, value)
+                position = Position.objects.filter(id=data.data["position_id"]).first()
                 if position:
-                    employee.position = position
+                    employee.position.add(position)
                 employee.save()
                 return Response(model_to_dict(position), status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
