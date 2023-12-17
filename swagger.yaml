@@ -1,0 +1,372 @@
+swagger: '2.0'
+info:
+  title: Snippets API
+  description: Test description
+  termsOfService: https://www.google.com/policies/terms/
+  contact:
+    email: contact@snippets.local
+  license:
+    name: BSD License
+  version: v1
+host: 127.0.0.1:8000
+schemes:
+- http
+basePath: /api/v1
+consumes:
+- application/json
+produces:
+- application/json
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+- Basic: []
+paths:
+  /departments:
+    get:
+      operationId: departments_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Department'
+      tags:
+      - departments
+    post:
+      operationId: departments_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Department'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Department'
+      tags:
+      - departments
+    parameters: []
+  /departments/{department_id}/:
+    get:
+      operationId: departments_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Department'
+      tags:
+      - departments
+    put:
+      operationId: departments_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Department'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Department'
+      tags:
+      - departments
+    delete:
+      operationId: departments_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - departments
+    parameters:
+    - name: department_id
+      in: path
+      required: true
+      type: string
+  /departments/{department_id}/positions:
+    get:
+      operationId: departments_positions_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Position'
+      tags:
+      - departments
+    post:
+      operationId: departments_positions_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PositionCreate'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/PositionCreate'
+      tags:
+      - departments
+    parameters:
+    - name: department_id
+      in: path
+      required: true
+      type: string
+  /departments/{department_id}/positions/{position_id}/:
+    get:
+      operationId: departments_positions_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Position'
+      tags:
+      - departments
+    put:
+      operationId: departments_positions_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PositionCreate'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/PositionCreate'
+      tags:
+      - departments
+    delete:
+      operationId: departments_positions_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - departments
+    parameters:
+    - name: department_id
+      in: path
+      required: true
+      type: string
+    - name: position_id
+      in: path
+      required: true
+      type: string
+  /employees:
+    get:
+      operationId: employees_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Employee'
+      tags:
+      - employees
+    post:
+      operationId: employees_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/EmployeeCreate'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/EmployeeCreate'
+      tags:
+      - employees
+    parameters: []
+  /employees/{employee_id}/:
+    get:
+      operationId: employees_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Employee'
+      tags:
+      - employees
+    put:
+      operationId: employees_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/EmployeeUpdate'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/EmployeeUpdate'
+      tags:
+      - employees
+    delete:
+      operationId: employees_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - employees
+    parameters:
+    - name: employee_id
+      in: path
+      required: true
+      type: string
+definitions:
+  Department:
+    required:
+    - title
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      title:
+        title: Title
+        type: string
+        maxLength: 100
+        minLength: 1
+      chief_department:
+        title: Chief department
+        type: integer
+        x-nullable: true
+  Position:
+    required:
+    - department
+    - title
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      department:
+        $ref: '#/definitions/Department'
+      title:
+        title: Title
+        type: string
+        maxLength: 100
+        minLength: 1
+      permission:
+        title: Permission
+        type: integer
+        enum:
+        - 10
+        - 20
+        - 30
+  PositionCreate:
+    required:
+    - title
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      title:
+        title: Title
+        type: string
+        maxLength: 100
+        minLength: 1
+      permission:
+        title: Permission
+        type: integer
+        enum:
+        - 10
+        - 20
+        - 30
+  Employee:
+    required:
+    - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      position:
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+  EmployeeCreate:
+    required:
+    - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+  EmployeeUpdate:
+    required:
+    - position_id
+    - name
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      position_id:
+        title: Position id
+        type: integer
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
